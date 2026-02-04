@@ -5,7 +5,7 @@ import {Home} from "./Pages/Home"
 import { Login } from "./Pages/Login";
 import { Register } from "./Pages/Register";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api";
 
 
 
@@ -22,7 +22,7 @@ const UserLogin=()=>{
         
         if(token){
             try{
-                const res= await axios.get('/api/users/me',{
+                const res= await api.get('/me',{
                     headers:{Authorization: `Bearer ${token}`}
                 })
                 setUser(res.data)

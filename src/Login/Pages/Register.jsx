@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../../api";
 import { useNavigate } from "react-router-dom";
 
 export const Register=({setUser})=>{
@@ -18,7 +18,7 @@ export const Register=({setUser})=>{
     const handleSubmit=async (e) =>{
         e.preventDefault();
         try{
-            const res=await axios.post("/api/users/register",formData);
+            const res=await api.post("/register",formData);
             localStorage.setItem("token",res.data.token);
             setUser(res.data);
             navigate('/');
