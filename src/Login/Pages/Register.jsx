@@ -20,6 +20,7 @@ export const Register=({setUser})=>{
         try{
             const res=await api.post("/register",formData);
             localStorage.setItem("token",res.data.token);
+            localStorage.removeItem("uniwallet_vault");
             setUser(res.data);
             navigate('/');
         }catch(err){
