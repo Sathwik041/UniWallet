@@ -50,7 +50,10 @@ export const UniWallet = ({ user }) => {
     };
 
     const unlockVault = () => {
-        if (!password) return;
+        if (!password) {
+            showToast("Incorrect Password", "error");
+            return;
+        }
         
         const encrypted = localStorage.getItem("uniwallet_vault");
         const data = decryptData(encrypted, password);
@@ -153,6 +156,7 @@ export const UniWallet = ({ user }) => {
                     <div className="bg-gray-900 border border-gray-700 p-6 rounded-lg">
                         <h2 className="text-xl mb-4 text-center font-semibold text-gray-200">Setup New Wallet</h2>
                         <p className="text-gray-400 text-center mb-6 text-sm">Generate a seed phrase and set a password to encrypt it locally.</p>
+                        
                         
                         <SeedPhrase mnemonic={mnemonic} onMnemonicGenerated={setMnemonic} />
                         
