@@ -146,7 +146,7 @@ export const UniWallet = ({}) => {
 
     return (
         <div className="min-h-screen bg-black text-white pb-10">
-            <div className="container mx-auto flex justify-between items-center pt-2 px-2">
+            <div className="container mx-auto flex justify-between items-center pt-2 px-6 md:px-10">
                 <div className="flex items-center">
                     <img src="/Wallet_Img.png" alt="Wallet Logo" className="w-25 h-30 object-contain" />
                     <h1 className="text-2xl font-bold">UNIWALLET</h1>
@@ -160,7 +160,7 @@ export const UniWallet = ({}) => {
             </div>
 
             {vaultState === "NO_WALLET" && (
-                <div className="container mx-auto px-4 mt-8 max-w-2xl">
+                <div className="container mx-auto px-6 md:px-10 mt-8 max-w-2xl">
                     <div className="bg-gray-900 border border-gray-700 p-6 rounded-lg">
                         <h2 className="text-xl mb-4 text-center font-semibold text-gray-200">Setup New Wallet</h2>
                         <p className="text-gray-400 text-center mb-6 text-sm">Generate a seed phrase and set a password to encrypt it locally.</p>
@@ -195,7 +195,7 @@ export const UniWallet = ({}) => {
             )}
 
             {vaultState === "UNLOCKED" && (
-                <div className="animate-fade-in">
+                <div className="animate-fade-in container mx-auto px-6 md:px-10">
                    {/* Pass disableGeneration to prevent regenerating seed when unlocked */}
                    <SeedPhrase mnemonic={mnemonic} onMnemonicGenerated={setMnemonic} disableGeneration={true} />
                    <SelectToken 

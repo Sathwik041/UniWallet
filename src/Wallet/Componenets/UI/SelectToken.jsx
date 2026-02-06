@@ -22,7 +22,7 @@ const SelectToken=({mnemonic,solanaCount,ethCount,updateWalletCounts})=>{
 
     return(
         <div >
-            <div className="m-4 md:m-10 text-gray-200 flex flex-col md:flex-row justify-between p-4 gap-4">
+            <div className="my-8 text-gray-200 flex flex-col md:flex-row justify-between p-4 gap-4">
                 <h1 className='text-3xl text-center md:text-left'>{selected} Wallets</h1>
                 <div className="flex justify-center md:justify-end gap-4 md:gap-10">
                     <div className="relative">
