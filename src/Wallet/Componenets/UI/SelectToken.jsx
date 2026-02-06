@@ -26,6 +26,7 @@ const SelectToken=({mnemonic,solanaCount,ethCount,updateWalletCounts})=>{
                 <h1 className='text-3xl text-center md:text-left'>{selected} Wallets</h1>
                 <div className="flex justify-center md:justify-end gap-4 md:gap-10">
                     <div className="relative">
+                        {/* switching between mainnet and testnet Wallets */}
                         <div onClick={()=>setOpen(!open)}
                         className="border border-white bg-gray-800 p-3 rounded-md cursor-pointer flex items-center gap-2">
                             {selected}

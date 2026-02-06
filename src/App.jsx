@@ -1,5 +1,5 @@
 import React from "react";
-import UserLogin from "./Login/UserLogin";
+import { UniWallet } from "./Wallet/UniWallet";
 import Toast from "./Wallet/Componenets/UI/Copy_toast";
 import './index.css'
 
@@ -7,7 +7,7 @@ function App() {
 
   return (
     <>
-      <UserLogin />
+      <UniWallet />
       <Toast />
     </>
   );

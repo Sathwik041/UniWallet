@@ -4,7 +4,7 @@ import SelectToken from "./Componenets/UI/SelectToken.jsx";
 import { encryptData, decryptData } from "./utils/cryptoUtils.js";
 import useToastStore from "./store/toaststore.js";
 
-export const UniWallet = ({ user }) => {
+export const UniWallet = ({}) => {
     const [mnemonic, setMnemonic] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -111,7 +111,11 @@ export const UniWallet = ({ user }) => {
     };
 
     if (vaultState === "LOADING") {
-        return <div className="min-h-screen bg-black text-white flex items-center justify-center">Loading...</div>;
+        return (
+            <div className="min-h-screen flex justify-center items-center bg-black bg-opacity-50 text-white text-2xl">
+                Loading...
+            </div>
+        );
     }
 
     if (vaultState === "LOCKED") {
@@ -142,8 +146,12 @@ export const UniWallet = ({ user }) => {
 
     return (
         <div className="min-h-screen bg-black text-white pb-10">
-            <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-                 <h1 className="text-2xl font-bold">🔏</h1>
+            <div className="container mx-auto flex justify-between items-center pt-2 px-2">
+                <div className="flex items-center">
+                    <img src="/Wallet_Img.png" alt="Wallet Logo" className="w-25 h-30 object-contain" />
+                    <h1 className="text-2xl font-bold">UNIWALLET</h1>
+                </div>
+                 
                  {vaultState === "UNLOCKED" && (
                     <button onClick={lockWallet} className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm font-medium transition-colors cursor-pointer">
                         Lock Wallet

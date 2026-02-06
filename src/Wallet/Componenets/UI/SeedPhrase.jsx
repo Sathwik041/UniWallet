@@ -54,7 +54,7 @@ const SeedPhrase=({mnemonic,onMnemonicGenerated,disableGeneration=false})=>{
     return(
         <div >
            {!disableGeneration && (
-             <div className="flex items-center justify-center gap-4 " >
+             <div className="flex flex-wrap items-center justify-center gap-4" >
                 <button onClick={createseed} className={`border border-white p-2 rounded-md bg-gray-200 cursor-pointer hover:bg-gray-200 hover:text-black ${!seedavailable && mnemonic ? 'bg-gray-600' : 'bg-gray-800'}`}
                 >Generate Seed Phrase</button>
                 <button onClick={enableManualMode} className={`border border-white p-2 rounded-md bg-gray-200 cursor-pointer hover:bg-gray-200 hover:text-black ${seedavailable ? 'bg-gray-600' : 'bg-gray-800'}`}
@@ -79,7 +79,7 @@ const SeedPhrase=({mnemonic,onMnemonicGenerated,disableGeneration=false})=>{
             {mnemonic && !seedavailable && (
                 <div className="mt-4 text-gray-200 container mx-auto border border-white p-4 rounded-md bg-gray-800 " >
                 <div onClick={()=>setIsExpanded(!isExpanded)} className="flex justify-between w-full items-center">
-                    <h1 className='text-2xl text-gray-200'>Secret Phrase</h1>
+                    <h1 className='text-2xl text-gray-200'>Secret Phrase 🔏</h1>
                     <div className='flex gap-6 mr-1 '>
                     { isExpanded && <button onClick={() => copyToClipboard(mnemonic)} className='bg-black p-2 border border-white rounded cursor-pointer '>Copy</button>  }                        
                     <button onClick={()=> setIsExpanded(!isExpanded)}

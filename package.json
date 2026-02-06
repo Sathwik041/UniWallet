@@ -13,7 +13,6 @@
     "@scure/bip39": "^2.0.1",
     "@solana/web3.js": "^1.98.4",
     "@tailwindcss/vite": "^4.1.18",
-    "axios": "^1.13.2",
     "bip39": "^3.1.0",
     "bs58": "^6.0.0",
     "crypto-js": "^4.2.0",
@@ -21,7 +20,6 @@
     "ethers": "^6.16.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-router-dom": "^7.12.0",
     "tailwindcss": "^4.1.18",
     "tweetnacl": "^1.0.3",
     "zustand": "^5.0.10"
