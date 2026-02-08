@@ -12,6 +12,8 @@ export const UniWallet = ({}) => {
     const [encryptionKey, setEncryptionKey] = useState("");
     const [solanaCount, setSolanaCount] = useState(0);
     const [ethCount, setEthCount] = useState(0);
+    const [selectednet,setSelectedNet]=useState("Mainnet");
+    const [netDropdownOpen,setNetDropdownOpen]=useState(false);
 
     // Get showToast from toast store
     const showToast = useToastStore((state) => state.showToast);
@@ -146,16 +148,43 @@ export const UniWallet = ({}) => {
 
     return (
         <div className="min-h-screen bg-black text-white pb-10">
-            <div className="container mx-auto flex justify-between items-center pt-2 px-6 md:px-10">
+            <div className="container mx-auto flex flex-col md:flex-row justify-between items-center pt-2 px-6 md:px-10 gap-4">
                 <div className="flex items-center">
-                    <img src="/Wallet_Img.png" alt="Wallet Logo" className="w-25 h-30 object-contain" />
+                    <img src="/Wallet_Img.png" alt="Wallet Logo" className="w-24 h-24 object-contain" />
                     <h1 className="text-2xl font-bold">UNIWALLET</h1>
                 </div>
+
                  
                  {vaultState === "UNLOCKED" && (
-                    <button onClick={lockWallet} className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm font-medium transition-colors cursor-pointer">
+                    <div className="flex items-center gap-4">
+                        <div className="relative">
+                            {/* switching between mainnet and testnet Wallets */}
+                         <div onClick={()=>setNetDropdownOpen(!netDropdownOpen)}
+                        className="border border-white bg-gray-800 p-3 rounded-md cursor-pointer flex items-center gap-2">
+                            <span className={`w-2 h-2 ${selectednet === 'Mainnet' ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                            {selectednet}
+                            <span>{netDropdownOpen ? "🔻":"🔺"}</span>
+                        </div>
+
+                         {netDropdownOpen && (
+                            <div className="absolute top-full left-0 mt-2 w-full bg-gray-800 border border-white p-2 rounded-md cursor-pointer flex flex-col gap-2 z-10">
+                                {["Mainnet","Testnet"].map((net)=>(
+                                    <div key={net} onClick={()=>{ setSelectedNet(net);
+                                        setNetDropdownOpen(false);
+                                    }} className="hover:bg-gray-700 p-1 rounded">
+                                        {net}
+                                        {selectednet===net && ' ✔️'} 
+
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        </div>
+                             
+                    <button onClick={lockWallet} className="bg-red-600 hover:bg-red-700 px-4 py-3 rounded text-sm font-medium transition-colors cursor-pointer">
                         Lock Wallet
                     </button>
+                    </div>
                  )}
             </div>
 
@@ -203,6 +232,7 @@ export const UniWallet = ({}) => {
                         solanaCount={solanaCount} 
                         ethCount={ethCount} 
                         updateWalletCounts={updateWalletCounts} 
+                        selectednet={selectednet}
                    />
                 </div>
             )}

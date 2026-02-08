@@ -26,7 +26,7 @@ function createWallet(mnemonic, index) {
     };
 }
 
-const SolanaWallet = ({ mnemonic, walletCount }) => {
+const SolanaWallet = ({ mnemonic, walletCount, selectednet }) => {
     const [wallets, setWallets] = useState([]);
     const[visibleIndex,setVisibleIndex]=useState(null);
     const[sendingWalletIndex,setSendingWalletIndex]=useState(null);
@@ -48,20 +48,22 @@ const SolanaWallet = ({ mnemonic, walletCount }) => {
 
     const fetchBalance=async (address)=>{
         try{
-            const connection=new Connection("https://api.devnet.solana.com");
+            const rpcUrl= selectednet==="Mainnet" ? "https://solana-mainnet.g.alchemy.com/v2/gWFPvImhts-OGEUAZyed0" : "https://api.devnet.solana.com";
+            const connection=new Connection(rpcUrl);
             const publicKey=new PublicKey(address);//address is a plain string but RPC doesnot approve this ,it needs to decode Base58, Verify length-32 bytes,valid solana address for rpc
             const balanceLamports=await connection.getBalance(publicKey);
             const balanceSol=balanceLamports/LAMPORTS_PER_SOL;
             setBalances(prev=>({...prev,[address]:balanceSol}));
         }catch(error){
             console.error("Failed to fetch balance:",error);
+            setBalances(prev=>({...prev,[address]: "Error"}));
         }
     };
 
     useEffect(()=>{
         wallets.forEach(wallet=>{fetchBalance(wallet.publicKey)});
 
-    },[wallets])
+    },[wallets,selectednet])
 
 
     return ( mnemonic && walletCount > 0 && 
@@ -71,7 +73,7 @@ const SolanaWallet = ({ mnemonic, walletCount }) => {
                 <div key={index} className="mb-4 p-4 bg-gray-900 rounded-lg flex flex-col gap-2">
                     <div className="text-gray-200 p-2 text-3xl font-bold"><img src="/solana-sol-icon.svg" alt="Solana" className="inline-block m-2 w-12 h-8" />
                      Wallet {index + 1}</div>
-                     <div className="border border-white mt-2 p-3 min-w rounded-md bg-gray-700 flex justify-between items-center" >
+                     <div className="border border-white mt-2 p-3 rounded-md bg-gray-700 flex justify-between items-center" >
                             <h2>Balance</h2>
                             <div className="flex items-center gap-2">
                                  <span className="font-mono">{balances[wallet.publicKey]!== undefined ? `${balances[wallet.publicKey]} SOL` : "Loading..."}</span>
@@ -102,6 +104,7 @@ const SolanaWallet = ({ mnemonic, walletCount }) => {
                 <SendSol senderAddress={wallets[sendingWalletIndex].publicKey}
                 senderPrivateKey={wallets[sendingWalletIndex].privateKey} 
                 onClose={()=>setSendingWalletIndex(null)}
+                selectednet={selectednet}
                 />
             )}
         </div>

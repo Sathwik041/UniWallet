@@ -5,7 +5,7 @@ import { useState } from "react";
 
 
 
-const SendSol=({senderAddress,senderPrivateKey,onClose})=>{
+const SendSol=({senderAddress,senderPrivateKey,onClose,selectednet})=>{
     const [recipient,setRecipient]=useState("");
     const [amount,setAmount]=useState("");
     const [status,setStatus]=useState("idle");//idle,sending,success,error
@@ -22,7 +22,9 @@ const SendSol=({senderAddress,senderPrivateKey,onClose})=>{
 
         try{
             //Connect to Devnet,or you can SOL mainnet url here to send real SOL
-            const connection=new Connection("https://api.devnet.solana.com");
+            const rpcUrl= selectednet==="Mainnet" ? "https://api.mainnet-beta.solana.com" : "https://api.devnet.solana.com";
+            const connection=new Connection(rpcUrl);
+
             //Decode Privatekey/SecretKey as in Solana it is a base58 string
             const secretKey=bs58.decode(senderPrivateKey);
             const fromkeypair=Keypair.fromSecretKey(secretKey);
@@ -57,7 +59,7 @@ const SendSol=({senderAddress,senderPrivateKey,onClose})=>{
 
     return (<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 px-4">
         <div className="bg-gray-900 p-6 rounded-lg shadow-xl w-full max-w-md border border-gray-700">
-            <h2 className="text-2xl font-bold text-white mb-4text-white mb-4 text-center "> Send SOL</h2>
+            <h2 className="text-2xl font-bold text-white mb-4text-white mb-4 text-center "> Send SOL ({selectednet})</h2>
 
             {/* From Address ,is Locked */}
             <div className="mb-4">
@@ -86,7 +88,7 @@ const SendSol=({senderAddress,senderPrivateKey,onClose})=>{
             {status==="success" && (
                 <div className="mb-4 text-center">
                     <p className="text-green-400">Transaction Sent!</p>
-                    <a href={`https://explorer.solana.com/tx/${txHash}?cluster=devnet`}
+                    <a href={selectednet === "Mainnet" ? `https://explorer.solana.com/tx/${txHash}?cluster=mainnet`:`https://explorer.solana.com/tx/${txHash}?cluster=devnet`}
                     target="_blank" rel="noopener noreferrer"
                     className="text-blue-400 text-xs underline">
                      View on Explorer  

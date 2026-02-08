@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { useState } from "react";
 
 
-const SendEth=({senderAddress,senderPrivateKey,onClose})=>{
+const SendEth=({senderAddress,senderPrivateKey,onClose,selectednet})=>{
     const [recipient,setRecipient]=useState("");
     const [amount,setAmount]=useState("");
     const [status,setStatus]=useState("idle");//idle,sending,success,error
@@ -19,7 +19,10 @@ const SendEth=({senderAddress,senderPrivateKey,onClose})=>{
 
         try{
             //Using Sepolia test,or you can Eth mainnet url here to send real ETH 
-            const provider=new ethers.JsonRpcProvider("https://ethereum-sepolia-rpc.publicnode.com");
+            
+            const rpcUrl= selectednet==="Mainnet" ? "https://eth-mainnet.g.alchemy.com/v2/gWFPvImhts-OGEUAZyed0" : "https://ethereum-sepolia-rpc.publicnode.com";
+            const provider=new ethers.JsonRpcProvider(rpcUrl);
+
             const wallet=new ethers.Wallet(senderPrivateKey,provider);
 
             const tx=await wallet.sendTransaction({
@@ -72,7 +75,7 @@ const SendEth=({senderAddress,senderPrivateKey,onClose})=>{
             {status==="success" && (
                 <div className="mb-4 text-center">
                     <p className="text-green-400">Transaction Sent!</p>
-                    <a href={`https://sepolia.etherscan.io/tx/${txHash}`}
+                    <a href={selectednet === "Mainnet" ? `https://etherscan.io/tx/${txHash}`:`https://sepolia.etherscan.io/tx/${txHash}`}
                     target="_blank" rel="noopener noreferrer"
                     className="text-blue-400 text-xs underline">
                      View on Etherscan   

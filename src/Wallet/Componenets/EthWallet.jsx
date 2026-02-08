@@ -24,7 +24,7 @@ function createWallet(mnemonic, index) {
     };
 }
 
-const EthWallet = ({ mnemonic, walletCount }) => {
+const EthWallet = ({ mnemonic, walletCount, selectednet }) => {
     const [wallets, setWallets] = useState([]);
     const[visibleIndex,setVisibleIndex]=useState(null);
     const[sendingWalletIndex,setSendingWalletIndex]=useState(null);
@@ -46,18 +46,20 @@ const EthWallet = ({ mnemonic, walletCount }) => {
 
     const fetchBalance=async(address)=>{
         try{
-            const provider=new ethers.JsonRpcProvider("https://ethereum-sepolia-rpc.publicnode.com");
+            const rpcUrl= selectednet==="Mainnet" ? "https://eth-mainnet.g.alchemy.com/v2/gWFPvImhts-OGEUAZyed0" : "https://ethereum-sepolia-rpc.publicnode.com";
+            const provider=new ethers.JsonRpcProvider(rpcUrl);
             const balanceWei= await provider.getBalance(address);
             const balanceEth=ethers.formatEther(balanceWei);
             setBalances(prev=>({...prev,[address]: balanceEth}));
         }catch(error){
             console.error("Failed to fetch balance:",error);
+            setBalances(prev=>({...prev,[address]: "Error"}));
         }
     };
 
     useEffect(()=>{
         wallets.forEach(wallet=>{fetchBalance(wallet.publicKey)});
-    },[wallets])
+    },[wallets,selectednet])
 
     
 
@@ -69,7 +71,7 @@ const EthWallet = ({ mnemonic, walletCount }) => {
                 <div key={index} className="mb-4 p-4 bg-gray-900 rounded-lg flex flex-col gap-2">
                     <div className="text-gray-200 text-3xl font-bold"><img src="/eth-icon.svg" alt="Ethereum" className="inline-block  w-12 h-8" />
                      Wallet {index + 1}</div>
-                    <div className="border border-white mt-2 p-3 min-w rounded-md bg-gray-700 flex justify-between items-center" >
+                    <div className="border border-white mt-2 p-3 rounded-md bg-gray-700 flex justify-between items-center" >
                             <h2>Balance</h2>
                             <div className="flex items-center gap-2">
                                  <span className="font-mono">{balances[wallet.publicKey] ? `${balances[wallet.publicKey]} ETH` : "Loading..."}</span>
@@ -103,7 +105,8 @@ const EthWallet = ({ mnemonic, walletCount }) => {
             {sendingWalletIndex!==null && (
                 <SendEth senderAddress={wallets[sendingWalletIndex].publicKey} 
                 senderPrivateKey={wallets[sendingWalletIndex].privateKey}
-                onClose={()=>setSendingWalletIndex(null)}               
+                onClose={()=>setSendingWalletIndex(null)}
+                selectednet={selectednet}
                  />
             )}
         </div>
