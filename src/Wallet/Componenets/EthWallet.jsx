@@ -5,9 +5,8 @@ import { ethers, HDNodeWallet } from "ethers";
 
 import { useState, useEffect } from "react";
 import SendEth from "../Transactions/SendEth";
+import EthTransactionHistory from "../Transactions/EthTransactionHistory";
 import { copyToClipboard } from "../utils/copyToClipboard";
-
-
 
 function createWallet(mnemonic, index) {
     // Convert Mnemonic to Seed, seed is 64 bytes of key data
@@ -28,6 +27,7 @@ const EthWallet = ({ mnemonic, walletCount, selectednet }) => {
     const [wallets, setWallets] = useState([]);
     const[visibleIndex,setVisibleIndex]=useState(null);
     const[sendingWalletIndex,setSendingWalletIndex]=useState(null);
+    const[historyWalletIndex, setHistoryWalletIndex]=useState(null);
     const[balances,setBalances]=useState({});
 
     useEffect(() => {
@@ -46,7 +46,7 @@ const EthWallet = ({ mnemonic, walletCount, selectednet }) => {
 
     const fetchBalance=async(address)=>{
         try{
-            const rpcUrl= selectednet==="Mainnet" ? "https://eth-mainnet.g.alchemy.com/v2/gWFPvImhts-OGEUAZyed0" : "https://ethereum-sepolia-rpc.publicnode.com";
+            const rpcUrl= selectednet==="Mainnet" ? "https://eth-mainnet.g.alchemy.com/v2/gWFPvImhts-OGEUAZyed0" : "https://eth-sepolia.g.alchemy.com/v2/gWFPvImhts-OGEUAZyed0";
             const provider=new ethers.JsonRpcProvider(rpcUrl);
             const balanceWei= await provider.getBalance(address);
             const balanceEth=ethers.formatEther(balanceWei);
@@ -80,11 +80,14 @@ const EthWallet = ({ mnemonic, walletCount, selectednet }) => {
                                  </button>
                             </div>
                     </div>
-                    <button className="border border-white  p-2 min-w rounded-md bg-gray-700 cursor-pointer hover:bg-gray-200 hover:text-black" 
-                    onClick={()=>setSendingWalletIndex(index)}>
-                        Send</button>
-
-                    <div onClick={() => copyToClipboard(wallet.publicKey)} className="cursor-pointer mt-2 flex flex-col" >
+                    <div className="flex gap-2">
+                        <button className="border border-white p-2 flex-grow rounded-md bg-gray-700 cursor-pointer hover:bg-gray-200 hover:text-black" 
+                        onClick={()=>setSendingWalletIndex(index)}>
+                            Send</button>
+                        <button className="border border-white p-2 flex-grow rounded-md bg-gray-700 cursor-pointer hover:bg-gray-200 hover:text-black" 
+                        onClick={()=>setHistoryWalletIndex(index)}>
+                            History</button>
+                    </div>                    <div onClick={() => copyToClipboard(wallet.publicKey)} className="cursor-pointer mt-2 flex flex-col" >
                         <label className="text-green-400 mb-2" >Publickey :</label>
                         <code className="break-all">{wallet.publicKey}</code>
                         </div>
@@ -108,6 +111,13 @@ const EthWallet = ({ mnemonic, walletCount, selectednet }) => {
                 onClose={()=>setSendingWalletIndex(null)}
                 selectednet={selectednet}
                  />
+            )}
+            {historyWalletIndex!==null && (
+                <EthTransactionHistory 
+                    address={wallets[historyWalletIndex].publicKey}
+                    onClose={() => setHistoryWalletIndex(null)}
+                    selectednet={selectednet}
+                />
             )}
         </div>
     );

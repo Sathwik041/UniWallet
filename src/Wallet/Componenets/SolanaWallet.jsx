@@ -6,6 +6,7 @@ import nacl from "tweetnacl";
 import { useState, useEffect } from "react";
 import { derivePath } from "ed25519-hd-key";
 import SendSol from "../Transactions/SendSol";
+import SolanaTransactionHistory from "../Transactions/SolanaTransactionHistory";
 import { copyToClipboard } from "../utils/copyToClipboard";
 import { Connection, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 
@@ -30,6 +31,7 @@ const SolanaWallet = ({ mnemonic, walletCount, selectednet }) => {
     const [wallets, setWallets] = useState([]);
     const[visibleIndex,setVisibleIndex]=useState(null);
     const[sendingWalletIndex,setSendingWalletIndex]=useState(null);
+    const[historyWalletIndex, setHistoryWalletIndex]=useState(null);
     const[balances,setBalances]=useState({});
 
     useEffect(() => {
@@ -48,7 +50,7 @@ const SolanaWallet = ({ mnemonic, walletCount, selectednet }) => {
 
     const fetchBalance=async (address)=>{
         try{
-            const rpcUrl= selectednet==="Mainnet" ? "https://solana-mainnet.g.alchemy.com/v2/gWFPvImhts-OGEUAZyed0" : "https://api.devnet.solana.com";
+            const rpcUrl= selectednet==="Mainnet" ? "https://solana-mainnet.g.alchemy.com/v2/gWFPvImhts-OGEUAZyed0" : "https://solana-devnet.g.alchemy.com/v2/gWFPvImhts-OGEUAZyed0";
             const connection=new Connection(rpcUrl);
             const publicKey=new PublicKey(address);//address is a plain string but RPC doesnot approve this ,it needs to decode Base58, Verify length-32 bytes,valid solana address for rpc
             const balanceLamports=await connection.getBalance(publicKey);
@@ -82,10 +84,12 @@ const SolanaWallet = ({ mnemonic, walletCount, selectednet }) => {
                                  </button>
                             </div>
                     </div>
-                    <button className="border border-white p-2 min-w rounded-md bg-gray-700 cursor-pointer hover:bg-gray-200 hover:text-black"
-                     onClick={()=>setSendingWalletIndex(index)} >Send</button>
-
-                    <div onClick={()=>copyToClipboard(wallet.publicKey)} className="cursor-pointer mt-2 flex flex-col">
+                    <div className="flex gap-2">
+                        <button className="border border-white p-2 flex-grow rounded-md bg-gray-700 cursor-pointer hover:bg-gray-200 hover:text-black"
+                         onClick={()=>setSendingWalletIndex(index)} >Send</button>
+                        <button className="border border-white p-2 flex-grow rounded-md bg-gray-700 cursor-pointer hover:bg-gray-200 hover:text-black"
+                         onClick={()=>setHistoryWalletIndex(index)} >History</button>
+                    </div>                    <div onClick={()=>copyToClipboard(wallet.publicKey)} className="cursor-pointer mt-2 flex flex-col">
                         <label className="text-green-400 mb-2" >Publickey :</label>
                         <code className="break-all">{wallet.publicKey}</code>
                         </div>
@@ -105,6 +109,13 @@ const SolanaWallet = ({ mnemonic, walletCount, selectednet }) => {
                 senderPrivateKey={wallets[sendingWalletIndex].privateKey} 
                 onClose={()=>setSendingWalletIndex(null)}
                 selectednet={selectednet}
+                />
+            )}
+            {historyWalletIndex!==null && (
+                <SolanaTransactionHistory 
+                    address={wallets[historyWalletIndex].publicKey}
+                    onClose={() => setHistoryWalletIndex(null)}
+                    selectednet={selectednet}
                 />
             )}
         </div>
