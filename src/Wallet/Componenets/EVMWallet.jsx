@@ -11,7 +11,8 @@ import { copyToClipboard } from "../utils/copyToClipboard";
 function createWallet(mnemonic, index) {
     // Convert Mnemonic to Seed, seed is 64 bytes of key data
     const seed = mnemonicToSeedSync(mnemonic, wordlist);
-    const path = `m/44'/60'/${index}/0'`;
+    // Standard MetaMask (BIP-44) derivation path: m/44'/60'/0'/0/index
+    const path = `m/44'/60'/0'/0/${index}`;
 
     const hdNode = HDNodeWallet.fromSeed(seed);
     const child = hdNode.derivePath(path);
