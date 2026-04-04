@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { useState, useEffect } from "react";
 
 
-const SendEth=({senderAddress,senderPrivateKey,onClose,selectednet})=>{
+const SendEVM=({senderAddress,senderPrivateKey,onClose,selectednet,chainConfig})=>{
     const [recipient,setRecipient]=useState("");
     const [amount,setAmount]=useState("");
     const [status,setStatus]=useState("idle");//idle,sending,success,error
@@ -27,7 +27,7 @@ const SendEth=({senderAddress,senderPrivateKey,onClose,selectednet})=>{
             setGasError("");
 
             try {
-                const rpcUrl = selectednet === "Mainnet" ? "https://eth-mainnet.g.alchemy.com/v2/gWFPvImhts-OGEUAZyed0" : "https://ethereum-sepolia-rpc.publicnode.com";
+                const rpcUrl = chainConfig.rpcUrls[selectednet] || chainConfig.rpcUrls.Mainnet;
                 const provider = new ethers.JsonRpcProvider(rpcUrl);
 
                 // Using a flat 21,000 gas limit for standard ETH transfers
@@ -76,7 +76,7 @@ const SendEth=({senderAddress,senderPrivateKey,onClose,selectednet})=>{
         try{
             //Using Sepolia test,or you can Eth mainnet url here to send real ETH 
             
-            const rpcUrl= selectednet==="Mainnet" ? "https://eth-mainnet.g.alchemy.com/v2/gWFPvImhts-OGEUAZyed0" : "https://ethereum-sepolia-rpc.publicnode.com";
+            const rpcUrl= chainConfig.rpcUrls[selectednet] || chainConfig.rpcUrls.Mainnet;
             const provider=new ethers.JsonRpcProvider(rpcUrl);
 
             const wallet=new ethers.Wallet(senderPrivateKey,provider);
@@ -92,9 +92,9 @@ const SendEth=({senderAddress,senderPrivateKey,onClose,selectednet})=>{
             setStatus("success");
 
         }catch(error){
-            console.error("Eth Send Error:",error);
+            console.error(`${chainConfig.symbol} Send Error:`,error);
             setStatus("error");
-            setErrorMsg(error.message || "FaiLed to Send ETH");
+            setErrorMsg(error.message || `Failed to Send ${chainConfig.symbol}`);
         }
 
     }
@@ -102,7 +102,7 @@ const SendEth=({senderAddress,senderPrivateKey,onClose,selectednet})=>{
 
     return (<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 px-4">
         <div className="bg-gray-900 p-6 rounded-lg shadow-xl w-full max-w-md border border-gray-700">
-            <h2 className="text-2xl font-bold text-white mb-4text-white mb-4 text-center "> Send ETH</h2>
+            <h2 className="text-2xl font-bold text-white mb-4 text-center "> Send {chainConfig.symbol}</h2>
 
             {/* From Address ,is Locked */}
             <div className="mb-4">
@@ -120,7 +120,7 @@ const SendEth=({senderAddress,senderPrivateKey,onClose,selectednet})=>{
 
             {/* Amount */}
             <div className="mb-4">
-                <label className="block text-gray-200 text-sm font-bold mb-2">Amount (ETH)</label>
+                <label className="block text-gray-200 text-sm font-bold mb-2">Amount ({chainConfig.symbol})</label>
                 <input type="number" value={amount} onChange={(e)=>setAmount(e.target.value)} placeholder="0.00"
                 className="w-full bg-gray-800 p-2 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"/>
                 
@@ -129,7 +129,7 @@ const SendEth=({senderAddress,senderPrivateKey,onClose,selectednet})=>{
                     {isEstimatingGas && <span className="text-gray-400">Estimating gas fee...</span>}
                     {!isEstimatingGas && gasFee && (
                         <span className="text-gray-400">
-                            Estimated Gas Fee: <span className="font-semibold text-blue-400">~{Number(gasFee).toFixed(6)} ETH</span>
+                            Estimated Gas Fee: <span className="font-semibold text-blue-400">~{Number(gasFee).toFixed(6)} {chainConfig.symbol}</span>
                         </span>
                     )}
                     {!isEstimatingGas && gasError && (
@@ -143,10 +143,10 @@ const SendEth=({senderAddress,senderPrivateKey,onClose,selectednet})=>{
             {status==="success" && (
                 <div className="mb-4 text-center">
                     <p className="text-green-400">Transaction Sent!</p>
-                    <a href={selectednet === "Mainnet" ? `https://etherscan.io/tx/${txHash}`:`https://sepolia.etherscan.io/tx/${txHash}`}
+                    <a href={chainConfig.name === "Monad" ? `https://testnet.monadexplorer.com/tx/${txHash}` : selectednet === "Mainnet" ? `https://etherscan.io/tx/${txHash}`:`https://sepolia.etherscan.io/tx/${txHash}`}
                     target="_blank" rel="noopener noreferrer"
                     className="text-blue-400 text-xs underline">
-                     View on Etherscan   
+                     View on Explorer   
                     </a>
                 </div>
             )}
@@ -172,4 +172,4 @@ const SendEth=({senderAddress,senderPrivateKey,onClose,selectednet})=>{
 
 }
 
-export default SendEth;
+export default SendEVM;

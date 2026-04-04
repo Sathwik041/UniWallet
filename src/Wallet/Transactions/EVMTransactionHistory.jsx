@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 
-const EthTransactionHistory = ({ address, onClose, selectednet }) => {
+const EVMTransactionHistory = ({ address, onClose, selectednet, chainConfig }) => {
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -11,6 +11,13 @@ const EthTransactionHistory = ({ address, onClose, selectednet }) => {
             setLoading(true);
             setError(null);
             try {
+                if (chainConfig && chainConfig.name !== "Ethereum") {
+                    setTransactions([]);
+                    setError(`History fetching for ${chainConfig.name} is not supported yet without an indexed RPC.`);
+                    setLoading(false);
+                    return;
+                }
+
                 // Using Alchemy's enhanced APIs rather than Etherscan
                 const rpcUrl = selectednet === "Mainnet" 
                     ? "https://eth-mainnet.g.alchemy.com/v2/gWFPvImhts-OGEUAZyed0"
@@ -154,4 +161,4 @@ const EthTransactionHistory = ({ address, onClose, selectednet }) => {
     );
 };
 
-export default EthTransactionHistory;
+export default EVMTransactionHistory;

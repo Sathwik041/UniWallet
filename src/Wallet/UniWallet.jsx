@@ -12,6 +12,7 @@ export const UniWallet = ({}) => {
     const [encryptionKey, setEncryptionKey] = useState("");
     const [solanaCount, setSolanaCount] = useState(0);
     const [ethCount, setEthCount] = useState(0);
+    const [monadCount, setMonadCount] = useState(0);
     const [selectednet,setSelectedNet]=useState("Mainnet");
     const [netDropdownOpen,setNetDropdownOpen]=useState(false);
 
@@ -37,7 +38,7 @@ export const UniWallet = ({}) => {
              return;
         }
 
-        const encrypted = encryptData({ mnemonic, solanaCount: 0, ethCount: 0 }, password);
+        const encrypted = encryptData({ mnemonic, solanaCount: 0, ethCount: 0, monadCount: 0 }, password);
         if (encrypted) {
             localStorage.setItem("uniwallet_vault", encrypted);
             setVaultState("UNLOCKED");
@@ -64,6 +65,7 @@ export const UniWallet = ({}) => {
             setMnemonic(data.mnemonic);
             setSolanaCount(data.solanaCount || 0);
             setEthCount(data.ethCount || 0);
+            setMonadCount(data.monadCount || 0);
             setVaultState("UNLOCKED");
             setEncryptionKey(password);
             setPassword("");
@@ -76,14 +78,17 @@ export const UniWallet = ({}) => {
     const updateWalletCounts = (type, count) => {
         let newSol = solanaCount;
         let newEth = ethCount;
+        let newMonad = monadCount;
         if (type === 'Solana') { setSolanaCount(count); newSol = count; }
         if (type === 'Ethereum') { setEthCount(count); newEth = count; }
+        if (type === 'Monad') { setMonadCount(count); newMonad = count; }
 
         if (encryptionKey) {
             const encrypted = encryptData({
                 mnemonic,
                 solanaCount: newSol,
-                ethCount: newEth
+                ethCount: newEth,
+                monadCount: newMonad
             }, encryptionKey);
             localStorage.setItem("uniwallet_vault", encrypted);
         }
@@ -94,6 +99,7 @@ export const UniWallet = ({}) => {
         setEncryptionKey("");
         setSolanaCount(0);
         setEthCount(0);
+        setMonadCount(0);
         setVaultState("LOCKED");
         setPassword("");
     };
@@ -105,6 +111,7 @@ export const UniWallet = ({}) => {
             setEncryptionKey("");
             setSolanaCount(0);
             setEthCount(0);
+            setMonadCount(0);
             setVaultState("NO_WALLET");
             setPassword("");
             setConfirmPassword("");
@@ -230,7 +237,8 @@ export const UniWallet = ({}) => {
                    <SelectToken 
                         mnemonic={mnemonic} 
                         solanaCount={solanaCount} 
-                        ethCount={ethCount} 
+                        ethCount={ethCount}
+                        monadCount={monadCount} 
                         updateWalletCounts={updateWalletCounts} 
                         selectednet={selectednet}
                    />
