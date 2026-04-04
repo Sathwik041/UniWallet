@@ -13,7 +13,8 @@ import { Connection, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 function createWallet(mnemonic, index) {
     // Convert Mnemonic to Seed, seed is 64 bytes of key data
     const seed = mnemonicToSeedSync(mnemonic, wordlist);
-    const path=`m/44'/501'/${index}'/0'`;
+    //Standard BIP-44 derivation path
+    const path = `m/44'/501'/0'/0/${index}`;
 
 
     const derivedSeed = derivePath(path, seed).key;
