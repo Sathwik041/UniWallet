@@ -6,12 +6,13 @@ import { ethers, HDNodeWallet } from "ethers";
 import { useState, useEffect } from "react";
 import SendEVM from "../Transactions/SendEVM";
 import EVMTransactionHistory from "../Transactions/EVMTransactionHistory";
+import EVMNFTs from "../NFTs/EVMNFTs";
 import { copyToClipboard } from "../utils/copyToClipboard";
 
 function createWallet(mnemonic, index) {
     // Convert Mnemonic to Seed, seed is 64 bytes of key data
     const seed = mnemonicToSeedSync(mnemonic, wordlist);
-    // Standard MetaMask (BIP-44) derivation path: m/44'/60'/0'/0/index
+    // Standard (BIP-44) derivation path
     const path = `m/44'/60'/0'/0/${index}`;
 
     const hdNode = HDNodeWallet.fromSeed(seed);
@@ -29,6 +30,7 @@ const EVMWallet = ({ mnemonic, walletCount, selectednet, chainConfig }) => {
     const[visibleIndex,setVisibleIndex]=useState(null);
     const[sendingWalletIndex,setSendingWalletIndex]=useState(null);
     const[historyWalletIndex, setHistoryWalletIndex]=useState(null);
+    const[nftWalletIndex, setNftWalletIndex]=useState(null);
     const[balances,setBalances]=useState({});
 
     useEffect(() => {
@@ -90,6 +92,9 @@ const EVMWallet = ({ mnemonic, walletCount, selectednet, chainConfig }) => {
                         <button className="border border-white p-2 flex-grow rounded-md bg-gray-700 cursor-pointer hover:bg-gray-200 hover:text-black" 
                         onClick={()=>setHistoryWalletIndex(index)}>
                             History</button>
+                        <button className="border border-white p-2 flex-grow rounded-md bg-gray-700 cursor-pointer hover:bg-gray-200 hover:text-black" 
+                        onClick={()=>setNftWalletIndex(index)}>
+                            NFTs</button>
                     </div>                    <div onClick={() => copyToClipboard(wallet.publicKey)} className="cursor-pointer mt-2 flex flex-col" >
                         <label className="text-green-400 mb-2" >Publickey :</label>
                         <code className="break-all">{wallet.publicKey}</code>
@@ -120,6 +125,14 @@ const EVMWallet = ({ mnemonic, walletCount, selectednet, chainConfig }) => {
                 <EVMTransactionHistory 
                     address={wallets[historyWalletIndex].publicKey}
                     onClose={() => setHistoryWalletIndex(null)}
+                    selectednet={selectednet}
+                    chainConfig={chainConfig}
+                />
+            )}
+            {nftWalletIndex!==null && (
+                <EVMNFTs 
+                    address={wallets[nftWalletIndex].publicKey}
+                    onClose={() => setNftWalletIndex(null)}
                     selectednet={selectednet}
                     chainConfig={chainConfig}
                 />

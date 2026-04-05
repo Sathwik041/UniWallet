@@ -7,25 +7,32 @@ import { useState, useEffect } from "react";
 import { derivePath } from "ed25519-hd-key";
 import SendSol from "../Transactions/SendSol";
 import SolanaTransactionHistory from "../Transactions/SolanaTransactionHistory";
+import SolanaNFTs from "../NFTs/SolanaNFTs";
 import { copyToClipboard } from "../utils/copyToClipboard";
 import { Connection, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 
 function createWallet(mnemonic, index) {
-    // Convert Mnemonic to Seed, seed is 64 bytes of key data
-    const seed = mnemonicToSeedSync(mnemonic, wordlist);
-    //Standard BIP-44 derivation path
-    const path = `m/44'/501'/0'/0/${index}`;
+    try {
+        // Convert Mnemonic to Seed, seed is 64 bytes of key data
+        const seed = mnemonicToSeedSync(mnemonic, wordlist);
+        // Standard BIP-44 derivation path (all hardened)
+        // ed25519-hd-key requires every segment to end with ' (hardened)
+        const path = `m/44'/501'/${index}'/0'`;
 
+        // derivePath expects seed as a hex string
+        const seedHex = Buffer.from(seed).toString("hex");
+        const derivedSeed = derivePath(path, seedHex).key;
+        const keypair = nacl.sign.keyPair.fromSeed(derivedSeed);
 
-    const derivedSeed = derivePath(path, seed).key;
-    const keypair = nacl.sign.keyPair.fromSeed(derivedSeed);
-
-
-    return {
-        publicKey:bs58.encode(keypair.publicKey),
-        privateKey:bs58.encode(keypair.secretKey),
-        index,
-    };
+        return {
+            publicKey:bs58.encode(keypair.publicKey),
+            privateKey:bs58.encode(keypair.secretKey),
+            index,
+        };
+    } catch (error) {
+        console.error("Failed to create Solana wallet:", error);
+        return null;
+    }
 }
 
 const SolanaWallet = ({ mnemonic, walletCount, selectednet }) => {
@@ -33,6 +40,7 @@ const SolanaWallet = ({ mnemonic, walletCount, selectednet }) => {
     const[visibleIndex,setVisibleIndex]=useState(null);
     const[sendingWalletIndex,setSendingWalletIndex]=useState(null);
     const[historyWalletIndex, setHistoryWalletIndex]=useState(null);
+    const[nftWalletIndex, setNftWalletIndex]=useState(null);
     const[balances,setBalances]=useState({});
 
     useEffect(() => {
@@ -41,7 +49,8 @@ const SolanaWallet = ({ mnemonic, walletCount, selectednet }) => {
                 if(wallets.length<walletCount){
                     const newWallets=[...wallets];
                     for(let i=wallets.length;i<walletCount;i++){
-                        newWallets.push(createWallet(mnemonic,i));
+                        const w = createWallet(mnemonic,i);
+                        if (w) newWallets.push(w);
                     }
                      setWallets(newWallets);
                 }
@@ -90,6 +99,8 @@ const SolanaWallet = ({ mnemonic, walletCount, selectednet }) => {
                          onClick={()=>setSendingWalletIndex(index)} >Send</button>
                         <button className="border border-white p-2 flex-grow rounded-md bg-gray-700 cursor-pointer hover:bg-gray-200 hover:text-black"
                          onClick={()=>setHistoryWalletIndex(index)} >History</button>
+                        <button className="border border-white p-2 flex-grow rounded-md bg-gray-700 cursor-pointer hover:bg-gray-200 hover:text-black"
+                         onClick={()=>setNftWalletIndex(index)} >NFTs</button>
                     </div>                    <div onClick={()=>copyToClipboard(wallet.publicKey)} className="cursor-pointer mt-2 flex flex-col">
                         <label className="text-green-400 mb-2" >Publickey :</label>
                         <code className="break-all">{wallet.publicKey}</code>
@@ -116,6 +127,13 @@ const SolanaWallet = ({ mnemonic, walletCount, selectednet }) => {
                 <SolanaTransactionHistory 
                     address={wallets[historyWalletIndex].publicKey}
                     onClose={() => setHistoryWalletIndex(null)}
+                    selectednet={selectednet}
+                />
+            )}
+            {nftWalletIndex!==null && (
+                <SolanaNFTs 
+                    address={wallets[nftWalletIndex].publicKey}
+                    onClose={() => setNftWalletIndex(null)}
                     selectednet={selectednet}
                 />
             )}
