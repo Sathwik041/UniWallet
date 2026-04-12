@@ -1,5 +1,4 @@
 import { mnemonicToSeedSync } from "@scure/bip39";
-import { wordlist } from "@scure/bip39/wordlists/english.js";
 import bs58 from "bs58";
 import nacl from "tweetnacl";
 
@@ -14,7 +13,7 @@ import { Connection, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 function createWallet(mnemonic, index) {
     try {
         // Convert Mnemonic to Seed, seed is 64 bytes of key data
-        const seed = mnemonicToSeedSync(mnemonic, wordlist);
+        const seed = mnemonicToSeedSync(mnemonic, "");
         // Standard BIP-44 derivation path (all hardened)
         // ed25519-hd-key requires every segment to end with ' (hardened)
         const path = `m/44'/501'/${index}'/0'`;

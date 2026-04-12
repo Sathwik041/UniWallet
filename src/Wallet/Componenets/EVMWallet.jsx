@@ -1,5 +1,4 @@
 import { mnemonicToSeedSync } from "@scure/bip39";
-import { wordlist } from "@scure/bip39/wordlists/english.js";
 import { ethers, HDNodeWallet } from "ethers";
 
 
@@ -11,7 +10,7 @@ import { copyToClipboard } from "../utils/copyToClipboard";
 
 function createWallet(mnemonic, index) {
     // Convert Mnemonic to Seed, seed is 64 bytes of key data
-    const seed = mnemonicToSeedSync(mnemonic, wordlist);
+    const seed = mnemonicToSeedSync(mnemonic, "");
     // Standard (BIP-44) derivation path
     const path = `m/44'/60'/0'/0/${index}`;
 
