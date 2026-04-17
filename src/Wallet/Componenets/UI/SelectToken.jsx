@@ -32,10 +32,7 @@ const SelectToken=({mnemonic,solanaCount,ethCount,monadCount,updateWalletCounts,
         setOpen(false);
     }
 
-    const Selectnet=(selectednet)=>{
-        setSelectedNet(selectednet);
-        setOpenNet(false);
-    }
+
 
     
 
