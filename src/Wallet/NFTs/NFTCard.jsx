@@ -1,7 +1,10 @@
 import { useState } from "react";
 
-const NFTCard = ({ nft, onClick }) => {
+const NFTCard = ({ nft, onClick, chainName, chainIcon, walletIndex }) => {
     const [imgError, setImgError] = useState(false);
+
+    // Portfolio mode: show chain badge and wallet label
+    const isPortfolioMode = chainName !== undefined;
 
     return (
         <div
@@ -27,6 +30,13 @@ const NFTCard = ({ nft, onClick }) => {
                         </svg>
                     </div>
                 )}
+
+                {/* Chain badge — only shown in portfolio mode */}
+                {isPortfolioMode && chainIcon && (
+                    <div className="absolute top-2 left-2 bg-black/70 rounded-full p-1 backdrop-blur-sm border border-gray-600">
+                        <img src={chainIcon} alt={chainName} className="w-5 h-5 object-contain" />
+                    </div>
+                )}
             </div>
 
             {/* NFT Info */}
@@ -37,6 +47,12 @@ const NFTCard = ({ nft, onClick }) => {
                 <p className="text-gray-400 text-xs truncate mt-1" title={nft.collection}>
                     {nft.collection}
                 </p>
+                {/* Wallet label — only shown in portfolio mode */}
+                {isPortfolioMode && (
+                    <p className="text-gray-500 text-xs mt-1">
+                        {chainName} · Wallet #{walletIndex + 1}
+                    </p>
+                )}
             </div>
         </div>
     );

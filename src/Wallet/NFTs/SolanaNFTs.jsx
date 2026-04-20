@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import NFTCard from "./NFTCard";
 import NFTDetail from "./NFTDetail";
-
-// Interfaces that represent NFTs (not fungible tokens or other asset types)
-const NFT_INTERFACES = ["V1_NFT", "ProgrammableNFT", "V1_PRINT", "MplCoreAsset"];
+import { fetchSolanaNFTs } from "./nftFetchers";
 
 const SolanaNFTs = ({ address, onClose, selectednet }) => {
     const [nfts, setNfts] = useState([]);
@@ -12,76 +10,12 @@ const SolanaNFTs = ({ address, onClose, selectednet }) => {
     const [selectedNft, setSelectedNft] = useState(null);
 
     useEffect(() => {
-        const fetchNFTs = async () => {
+        const loadNFTs = async () => {
             setLoading(true);
             setError(null);
 
             try {
-                // Use the same Alchemy Solana RPC URL you already use for balances.
-                // The DAS (Digital Asset Standard) API is available as a JSON-RPC method
-                // on this same endpoint — no separate URL needed.
-                const rpcUrl =
-                    selectednet === "Mainnet"
-                        ? "https://solana-mainnet.g.alchemy.com/v2/gWFPvImhts-OGEUAZyed0"
-                        : "https://solana-devnet.g.alchemy.com/v2/gWFPvImhts-OGEUAZyed0";
-
-                const response = await fetch(rpcUrl, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        jsonrpc: "2.0",
-                        id: "nft-fetch",
-                        method: "getAssetsByOwner",
-                        params: {
-                            ownerAddress: address,
-                            page: 1,
-                            limit: 50,
-                            displayOptions: {
-                                showFungible: false,          // Only NFTs, not SPL tokens
-                                showCollectionMetadata: true, // Include collection info
-                            },
-                        },
-                    }),
-                });
-
-                const data = await response.json();
-
-                if (data.error) {
-                    throw new Error(data.error.message || "Solana DAS API error");
-                }
-
-                const items = data.result?.items || [];
-
-                // Filter to only NFT-type assets.
-                // The DAS API returns ALL digital assets (including fungible tokens).
-                // We check the 'interface' field to keep only actual NFTs.
-                const nftItems = items.filter((item) =>
-                    NFT_INTERFACES.includes(item.interface)
-                );
-
-                // Normalize each NFT into the same shape that NFTCard/NFTDetail expect.
-                // Solana NFTs have a different structure from EVM:
-                //   - content.metadata.name → NFT name
-                //   - content.links.image → image URL
-                //   - content.files[0].cdn_uri → alternative CDN image
-                //   - grouping → array of group objects, one of which is the collection
-                //   - id → the mint address (equivalent to tokenId on EVM)
-                const normalizedNfts = nftItems.map((item) => ({
-                    name: item.content?.metadata?.name || "Unnamed NFT",
-                    image:
-                        item.content?.links?.image ||
-                        item.content?.files?.[0]?.cdn_uri ||
-                        item.content?.files?.[0]?.uri ||
-                        "",
-                    collection:
-                        item.grouping?.find((g) => g.group_key === "collection")
-                            ?.collection_metadata?.name || "Unknown Collection",
-                    tokenId: item.id, // Mint address on Solana
-                    contractAddress: null, // Solana doesn't have contract addresses like EVM
-                    attributes: item.content?.metadata?.attributes || [],
-                    explorerUrl: `https://explorer.solana.com/address/${item.id}?cluster=${selectednet === "Mainnet" ? "mainnet-beta" : "devnet"}`,
-                }));
-
+                const normalizedNfts = await fetchSolanaNFTs(address, selectednet);
                 setNfts(normalizedNfts);
             } catch (err) {
                 console.error("Error fetching Solana NFTs:", err);
@@ -91,7 +25,7 @@ const SolanaNFTs = ({ address, onClose, selectednet }) => {
         };
 
         if (address) {
-            fetchNFTs();
+            loadNFTs();
         }
     }, [address, selectednet]);
 

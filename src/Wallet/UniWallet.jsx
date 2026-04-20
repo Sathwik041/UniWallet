@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import SeedPhrase from "./Componenets/UI/SeedPhrase.jsx";
 import SelectToken from "./Componenets/UI/SelectToken.jsx";
+import AllAssetsView from "./Componenets/AllAssetsView.jsx";
 import { encryptData, decryptData } from "./utils/cryptoUtils.js";
 import useToastStore from "./store/toaststore.js";
 
@@ -15,6 +16,7 @@ export const UniWallet = ({}) => {
     const [monadCount, setMonadCount] = useState(0);
     const [selectednet,setSelectedNet]=useState("Mainnet");
     const [netDropdownOpen,setNetDropdownOpen]=useState(false);
+    const [viewMode, setViewMode] = useState("wallets"); // "wallets" | "portfolio"
 
     // Get showToast from toast store
     const showToast = useToastStore((state) => state.showToast);
@@ -186,7 +188,18 @@ export const UniWallet = ({}) => {
                                 ))}
                             </div>
                         )}
-                        </div>
+                         </div>
+
+                    <button
+                        onClick={() => setViewMode(viewMode === "wallets" ? "portfolio" : "wallets")}
+                        className={`px-4 py-3 rounded text-sm font-medium transition-colors cursor-pointer border ${
+                            viewMode === "portfolio"
+                                ? "bg-blue-600 hover:bg-blue-700 border-blue-500 text-white"
+                                : "bg-gray-800 hover:bg-gray-700 border-gray-600 text-gray-200"
+                        }`}
+                    >
+                        {viewMode === "portfolio" ? "💳 Wallets" : "📊 Portfolio"}
+                    </button>
                              
                     <button onClick={lockWallet} className="bg-red-600 hover:bg-red-700 px-4 py-3 rounded text-sm font-medium transition-colors cursor-pointer">
                         Lock Wallet
@@ -232,16 +245,28 @@ export const UniWallet = ({}) => {
 
             {vaultState === "UNLOCKED" && (
                 <div className="animate-fade-in container mx-auto px-6 md:px-10">
-                   {/* Pass disableGeneration to prevent regenerating seed when unlocked */}
-                   <SeedPhrase mnemonic={mnemonic} onMnemonicGenerated={setMnemonic} disableGeneration={true} />
-                   <SelectToken 
-                        mnemonic={mnemonic} 
-                        solanaCount={solanaCount} 
-                        ethCount={ethCount}
-                        monadCount={monadCount} 
-                        updateWalletCounts={updateWalletCounts} 
-                        selectednet={selectednet}
-                   />
+                   {viewMode === "wallets" ? (
+                       <>
+                           {/* Pass disableGeneration to prevent regenerating seed when unlocked */}
+                           <SeedPhrase mnemonic={mnemonic} onMnemonicGenerated={setMnemonic} disableGeneration={true} />
+                           <SelectToken 
+                                mnemonic={mnemonic} 
+                                solanaCount={solanaCount} 
+                                ethCount={ethCount}
+                                monadCount={monadCount} 
+                                updateWalletCounts={updateWalletCounts} 
+                                selectednet={selectednet}
+                           />
+                       </>
+                   ) : (
+                       <AllAssetsView
+                           mnemonic={mnemonic}
+                           solanaCount={solanaCount}
+                           ethCount={ethCount}
+                           monadCount={monadCount}
+                           selectednet={selectednet}
+                       />
+                   )}
                 </div>
             )}
         </div>
